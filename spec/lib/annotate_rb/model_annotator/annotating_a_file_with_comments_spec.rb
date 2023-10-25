@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe AnnotateRb::ModelAnnotator::SingleFileAnnotator do
+RSpec.describe "Annotating a file with comments" do
   include AnnotateTestHelpers
   include AnnotateTestConstants
 
