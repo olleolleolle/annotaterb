@@ -139,6 +139,102 @@ RSpec.describe AnnotateRb::ModelAnnotator::SingleFileAnnotator do
       end
     end
 
+    context "with magic and human comments before class declaration without a line break between" do
+      let(:starting_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+          # some comment about the class
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          # some comment about the class
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with magic and human comments before class declaration with a line break between them" do
+      let(:starting_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+
+          # some comment about the class
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          # some comment about the class
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with magic and human comments before class declaration with a line break before class declaration" do
+      let(:starting_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+          # some comment about the class
+
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          # some comment about the class
+
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
     context "with `position_in_class: after`" do
       let(:options) { AnnotateRb::Options.new({position_in_class: :after}) }
 
@@ -244,6 +340,103 @@ RSpec.describe AnnotateRb::ModelAnnotator::SingleFileAnnotator do
         let(:expected_file_content) do
           <<~FILE
             # some comment about the class
+            class User < ApplicationRecord
+            end
+
+            # == Schema Information
+            #
+            # Table name: users
+            #
+            #  id                     :bigint           not null, primary key
+            #
+          FILE
+        end
+
+        it "writes the expected annotations to the file" do
+          AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+          expect(File.read(@model_file_name)).to eq(expected_file_content)
+        end
+      end
+
+      context "with magic and human comments before class declaration without a line break between" do
+        let(:starting_file_content) do
+          <<~FILE
+            # frozen_string_literal: true
+            # some comment about the class
+            class User < ApplicationRecord
+            end
+          FILE
+        end
+        let(:expected_file_content) do
+          <<~FILE
+            # frozen_string_literal: true
+            # some comment about the class
+            class User < ApplicationRecord
+            end
+
+            # == Schema Information
+            #
+            # Table name: users
+            #
+            #  id                     :bigint           not null, primary key
+            #
+          FILE
+        end
+
+        it "writes the expected annotations to the file" do
+          AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+          expect(File.read(@model_file_name)).to eq(expected_file_content)
+        end
+      end
+
+      context "with magic and human comments before class declaration with a line break between them" do
+        let(:starting_file_content) do
+          <<~FILE
+            # frozen_string_literal: true
+
+            # some comment about the class
+            class User < ApplicationRecord
+            end
+          FILE
+        end
+        let(:expected_file_content) do
+          <<~FILE
+            # frozen_string_literal: true
+
+            # some comment about the class
+            class User < ApplicationRecord
+            end
+
+            # == Schema Information
+            #
+            # Table name: users
+            #
+            #  id                     :bigint           not null, primary key
+            #
+          FILE
+        end
+
+        it "writes the expected annotations to the file" do
+          AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+          expect(File.read(@model_file_name)).to eq(expected_file_content)
+        end
+      end
+
+      context "with magic and human comments before class declaration with a line break before class declaration" do
+        let(:starting_file_content) do
+          <<~FILE
+            # frozen_string_literal: true
+            # some comment about the class
+
+            class User < ApplicationRecord
+            end
+          FILE
+        end
+        let(:expected_file_content) do
+          <<~FILE
+            # frozen_string_literal: true
+            # some comment about the class
+
             class User < ApplicationRecord
             end
 
