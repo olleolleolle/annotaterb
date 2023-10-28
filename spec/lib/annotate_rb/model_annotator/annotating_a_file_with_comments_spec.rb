@@ -650,4 +650,253 @@ RSpec.describe "Annotating a file with comments" do
       end
     end
   end
+
+  context "when annotating a file with existing annotations with new annotations" do
+    let(:schema_info) do
+      <<~SCHEMA
+      # == Schema Information
+      #
+      # Table name: users
+      #
+      #  id                     :bigint           not null, primary key
+      #  boolean                :boolean          default(FALSE)
+      #
+      SCHEMA
+    end
+
+    context "with magic comments before annotations with a line break between" do
+      let(:starting_file_content) do
+        <<~FILE
+          # typed: strong
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # typed: strong
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #  boolean                :boolean          default(FALSE)
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with magic comments before annotations without a line break between" do
+      let(:starting_file_content) do
+        <<~FILE
+          # typed: strong
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # typed: strong
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #  boolean                :boolean          default(FALSE)
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with human comments before annotations with line a break between" do
+      let(:starting_file_content) do
+        <<~FILE
+          # some comment about the class
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # some comment about the class
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #  boolean                :boolean          default(FALSE)
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with human comments before annotations without line a break between" do
+      let(:starting_file_content) do
+        <<~FILE
+          # some comment about the class
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # some comment about the class
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #  boolean                :boolean          default(FALSE)
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with magic and human comments before annotations without a line break between" do
+      let(:starting_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+          # some comment about the class
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+          # some comment about the class
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #  boolean                :boolean          default(FALSE)
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with magic and human comments before annotations with a line break between them" do
+      let(:starting_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+          # some comment about the class
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+      let(:expected_file_content) do
+        <<~FILE
+          # frozen_string_literal: true
+          # some comment about the class
+
+          # == Schema Information
+          #
+          # Table name: users
+          #
+          #  id                     :bigint           not null, primary key
+          #  boolean                :boolean          default(FALSE)
+          #
+          class User < ApplicationRecord
+          end
+        FILE
+      end
+
+      it "writes the expected annotations to the file" do
+        AnnotateRb::ModelAnnotator::SingleFileAnnotator.call(@model_file_name, schema_info, :position_in_class, options)
+        expect(File.read(@model_file_name)).to eq(expected_file_content)
+      end
+    end
+
+    context "with magic and human comments before annotations with a line break before class declaration" do
+
+    end
+
+    context "with human and magic comments before annotations without a line break between" do
+    end
+
+    context "with human and magic comments before annotations with a line break between them" do
+
+    end
+
+    context "with human and magic comments before annotations with a line break before class declaration" do
+
+    end
+  end
 end
